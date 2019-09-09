@@ -14,6 +14,7 @@ class App extends React.Component {
       { id: 1, label: 'buy milk', done: false, important: false },
       { id: 2, label: 'finish bot', done: false, important: false },
     ],
+    term: '',
   };
 
   deleteItem = id => {
@@ -62,19 +63,33 @@ class App extends React.Component {
     });
   };
 
+  onSearch = term => {
+    this.setState({ term });
+  };
+
+  search(items, term) {
+    if (!term.length) {
+      return items;
+    }
+    return items.filter(item => {
+      return item.label.toLowerCase().indexOf(term.toLowerCase()) > -1;
+    });
+  }
+
   render() {
-    const { todoData } = this.state;
+    const { todoData, term } = this.state;
+    const visibleItems = this.search(todoData, term);
     const doneCount = todoData.filter(el => el.done).length;
     const todoCount = todoData.length - doneCount;
     return (
       <div className="todo-app">
         <Header todo={todoCount} done={doneCount} />
         <div className="top-panel d-flex">
-          <SearchBar />
+          <SearchBar onSearch={this.onSearch} />
           <ItemFilter />
         </div>
         <TodoList
-          todos={this.state.todoData}
+          todos={visibleItems}
           onDelete={this.deleteItem}
           onToggleDone={this.onToggleDone}
           onToggleImportant={this.onToggleImportant}
